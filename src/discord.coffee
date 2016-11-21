@@ -87,11 +87,11 @@ class DiscordBot extends Adapter
                 @robot.logger.error err
 
 
-    sendFile: (envelope,messages...) ->
-     options = messages[0]
-     stream = fs.createReadStream(options.file)
-     for msg in [1...messages.length]
-       @client.sendFile rooms[envelope.room],stream, null, messages[msg]
+     sendFile: (envelope,messages...) ->
+       options = messages[0]
+       stream = fs.createReadStream(options.file)
+       for msg in [1...messages.length]
+         @client.sendFile rooms[envelope.room],stream, null, messages[msg]
 
 
 exports.use = (robot) ->
