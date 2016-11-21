@@ -13,7 +13,7 @@ class DiscordBot extends Adapter
      constructor: (robot)->
         super
         @robot = robot
-     
+
      run: ->
         @options =
             token: process.env.HUBOT_DISCORD_TOKEN
@@ -23,7 +23,7 @@ class DiscordBot extends Adapter
         @client = new Discord.Client {forceFetchUsers: true, autoReconnect: true}
         @client.on 'ready', @.ready
         @client.on 'message', @.message
-        
+
         @client.loginWithToken @options.token, null, null, (err) ->
           @robot.logger.error err
 
@@ -45,13 +45,13 @@ class DiscordBot extends Adapter
         user.id = message.author.id
         rooms[message.channel.id] ?= message.channel
 
-        text = message.cleanContent 
+        text = message.cleanContent
         if (message.channel instanceof Discord.PMChannel)
           text = "#{@robot.name}: #{text}" if not text.match new RegExp( "^@?#{@robot.name}" )
 
         @robot.logger.debug text
         @receive new TextMessage( user, text, message.id )
-     
+
      chunkMessage: (msg) =>
         subMessages = []
         if(msg.length > maxLength)
@@ -77,14 +77,21 @@ class DiscordBot extends Adapter
               remainingMessages = chunkedMessage.concat messages
               if err then @robot.logger.error err
               @send envelope, remainingMessages...)
-          
+
      reply: (envelope, messages...) ->
-        # discord.js reply function looks for a 'sender' which doesn't 
+        # discord.js reply function looks for a 'sender' which doesn't
         # exist in our envelope object
         user = envelope.user.name
         for msg in messages
           @client.sendMessage rooms[envelope.room], "#{user} #{msg}", (err) ->
                 @robot.logger.error err
+
+
+    sendFile: (envelope,messages...) ->
+     options = messages[0]
+     stream = fs.createReadStream(options.file)
+     for msg in [1...messages.length]
+       @client.sendFile rooms[envelope.room],stream, null, messages[msg]
 
 
 exports.use = (robot) ->
