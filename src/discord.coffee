@@ -89,7 +89,7 @@ class DiscordBot extends Adapter
 
      sendFile: (envelope,messages...) ->
        options = messages[0]
-       stream = fs.createReadStream(options.file)
+       stream = options.file #Must be a stream
        for msg in [1...messages.length]
          @client.sendFile rooms[envelope.room],stream, null, messages[msg]
 
